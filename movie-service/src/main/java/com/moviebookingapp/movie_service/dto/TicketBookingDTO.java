@@ -7,6 +7,7 @@ public class TicketBookingDTO {
     private String theatreName;
     private Long numberOfTickets;
     private List<String> seatNumbers;
+    private String username;
 
     public TicketBookingDTO() {}
 
@@ -22,4 +23,7 @@ public class TicketBookingDTO {
 
     public List<String> getSeatNumbers() { return seatNumbers; }
     public void setSeatNumbers(List<String> seatNumbers) { this.seatNumbers = seatNumbers; }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 }

@@ -63,8 +63,10 @@ public class SecurityConfig {
                         // Admin Endpoints: Update Ticket Status and Delete Movie
                         .requestMatchers(HttpMethod.PUT, "/api/v1.0/moviebooking/*/update/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1.0/moviebooking/*/delete/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1.0/moviebooking/admin/status/**").hasRole("ADMIN")
 
                         // Secured Endpoints: Booking a ticket requires the user to be logged in
+                        .requestMatchers(HttpMethod.POST, "/api/v1.0/moviebooking/*/add").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
 

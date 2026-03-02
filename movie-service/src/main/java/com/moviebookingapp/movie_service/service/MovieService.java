@@ -11,4 +11,8 @@ public interface MovieService {
     void deleteMovie(String movieName, String theatreName) throws Exception;
 
     Movie updateMovieTickets(String movieName, String theatreName, int newTotalTickets) throws Exception;
+
+    Movie addMovie(Movie movie);
+
+    Movie updateTicketStatusDirect(String movieName, String theatreName, String status) throws Exception;
 }

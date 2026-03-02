@@ -47,4 +47,29 @@ public class AdminController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
+
+    // Update ticket status directly (SOLD OUT, BOOK ASAP, AVAILABLE)
+    @PutMapping("/status/{movieName}/{theatreName}")
+    public ResponseEntity<?> updateTicketStatusDirect(
+            @PathVariable String movieName,
+            @PathVariable String theatreName,
+            @RequestParam String status) {
+        try {
+            Movie updated = movieService.updateTicketStatusDirect(movieName, theatreName, status);
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Add a new movie
+    @PostMapping("/add")
+    public ResponseEntity<?> addMovie(@RequestBody Movie movie) {
+        try {
+            Movie savedMovie = movieService.addMovie(movie);
+            return new ResponseEntity<>(savedMovie, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

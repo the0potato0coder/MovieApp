@@ -29,4 +29,12 @@ public class Movie {
 
     public void setTotalTicketsAllotted(int newTotalTickets) {
     }
+
+    public String getMovieName() {
+        return id != null ? id.getMovieName() : null;
+    }
+
+    public String getTheatreName() {
+        return id != null ? id.getTheatreName() : null;
+    }
 }

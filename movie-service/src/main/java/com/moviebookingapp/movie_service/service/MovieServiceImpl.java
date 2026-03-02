@@ -79,4 +79,23 @@ public class MovieServiceImpl implements MovieService {
             throw new Exception("Movie not found for deletion.");
         }
     }
+
+    @Override
+    public Movie addMovie(Movie movie) {
+        return movieRepository.save(movie);
+    }
+
+    @Override
+    public Movie updateTicketStatusDirect(String movieName, String theatreName, String status) throws Exception {
+        // Fix: MovieTheatreKey expects (theatreName, movieName)
+        MovieTheatreKey key = new MovieTheatreKey(theatreName, movieName);
+        java.util.Optional<Movie> movieOpt = movieRepository.findById(key);
+        if (movieOpt.isPresent()) {
+            Movie movie = movieOpt.get();
+            movie.setTicketStatus(status);
+            return movieRepository.save(movie);
+        } else {
+            throw new Exception("Movie screening not found.");
+        }
+    }
 }

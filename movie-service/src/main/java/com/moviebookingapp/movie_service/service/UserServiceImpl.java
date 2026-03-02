@@ -24,6 +24,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerUser(UserRegistrationDTO dto) throws Exception {
+        // Mandatory field validation
+        if (dto.getFirstName() == null || dto.getFirstName().trim().isEmpty()) {
+            throw new Exception("First Name is required!");
+        }
+        if (dto.getLastName() == null || dto.getLastName().trim().isEmpty()) {
+            throw new Exception("Last Name is required!");
+        }
+        if (dto.getEmail() == null || dto.getEmail().trim().isEmpty()) {
+            throw new Exception("Email is required!");
+        }
+        if (dto.getUsername() == null || dto.getUsername().trim().isEmpty()) {
+            throw new Exception("Login ID is required!");
+        }
+        if (dto.getPassword() == null || dto.getPassword().trim().isEmpty()) {
+            throw new Exception("Password is required!");
+        }
+        if (dto.getConfirmPassword() == null || dto.getConfirmPassword().trim().isEmpty()) {
+            throw new Exception("Confirm Password is required!");
+        }
+        if (dto.getContactNumber() == null || dto.getContactNumber().trim().isEmpty()) {
+            throw new Exception("Contact Number is required!");
+        }
+
         // 1. Client Requirement: Password and Confirm Password must be the same
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
             throw new Exception("Passwords do not match!");

@@ -9,7 +9,11 @@ import com.moviebookingapp.movie_service.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class TicketServiceImpl implements TicketService {
@@ -31,7 +35,8 @@ public class TicketServiceImpl implements TicketService {
         }
 
         // 2. Find the exact movie/theatre combination using our Composite Key
-        MovieTheatreKey key = new MovieTheatreKey(dto.getMovieName(), dto.getTheatreName());
+        // FIX: MovieTheatreKey expects (theatreName, movieName)
+        MovieTheatreKey key = new MovieTheatreKey(dto.getTheatreName(), dto.getMovieName());
         Optional<Movie> movieOptional = movieRepository.findById(key);
 
         if (movieOptional.isEmpty()) {
@@ -53,8 +58,34 @@ public class TicketServiceImpl implements TicketService {
             throw new Exception("Only " + availableTickets + " tickets are available for this screening.");
         }
 
-        // 5. Create and save the Ticket
-        Ticket newTicket = new Ticket(movie, dto.getNumberOfTickets(), dto.getSeatNumbers());
+        // 5. Check for double-booked seats
+        List<Ticket> existingTickets = ticketRepository.findByMovieNameAndTheatreName(dto.getMovieName(), dto.getTheatreName());
+        Set<String> bookedSeats = new HashSet<>();
+        for (Ticket t : existingTickets) {
+            if (t.getSeatNumbers() != null) bookedSeats.addAll(t.getSeatNumbers());
+        }
+        for (String seat : dto.getSeatNumbers()) {
+            if (bookedSeats.contains(seat)) {
+                throw new Exception("Seat " + seat + " is already booked. Please select another seat.");
+            }
+        }
+        // 6. Validate adjacent seats
+        List<String> seats = new ArrayList<>(dto.getSeatNumbers());
+        seats.sort((a, b) -> a.compareTo(b));
+        for (int i = 1; i < seats.size(); i++) {
+            String prev = seats.get(i - 1);
+            String curr = seats.get(i);
+            // Check if same row and seat numbers are consecutive
+            String prevRow = prev.replaceAll("\\d", "");
+            String currRow = curr.replaceAll("\\d", "");
+            int prevNum = Integer.parseInt(prev.replaceAll("\\D", ""));
+            int currNum = Integer.parseInt(curr.replaceAll("\\D", ""));
+            if (!prevRow.equals(currRow) || currNum != prevNum + 1) {
+                throw new Exception("Seats must be adjacent in the same row (e.g., A1, A2, A3).");
+            }
+        }
+        // 7. Create and save the Ticket
+        Ticket newTicket = new Ticket(movie, dto.getNumberOfTickets(), dto.getSeatNumbers(), dto.getUsername());
         return ticketRepository.save(newTicket);
     }
 
@@ -66,6 +97,21 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public java.util.List<Movie> getAllMovies() {
-        return movieRepository.findAll();}
+        return movieRepository.findAll();
+    }
 
+    @Override
+    public java.util.List<Ticket> getTicketsByUsername(String username) {
+        return ticketRepository.findByUsername(username);
+    }
+
+    @Override
+    public List<String> getBookedSeats(String movieName, String theatreName) {
+        List<Ticket> tickets = ticketRepository.findByMovieNameAndTheatreName(movieName, theatreName);
+        Set<String> bookedSeats = new HashSet<>();
+        for (Ticket t : tickets) {
+            if (t.getSeatNumbers() != null) bookedSeats.addAll(t.getSeatNumbers());
+        }
+        return new ArrayList<>(bookedSeats);
+    }
 }

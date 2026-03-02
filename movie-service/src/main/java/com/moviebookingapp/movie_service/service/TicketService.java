@@ -12,6 +12,9 @@ public interface TicketService {
 
     // Add this to TicketService.java
     java.util.List<Ticket> getBookedTickets(String movieName);
+    // Add this for My Tickets
+    java.util.List<Ticket> getTicketsByUsername(String username);
 
     List<Movie> getAllMovies();
+    List<String> getBookedSeats(String movieName, String theatreName);
 }

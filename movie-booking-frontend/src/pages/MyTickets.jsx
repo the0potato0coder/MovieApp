@@ -9,25 +9,30 @@ const MyTickets = () => {
     const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
     const navigate = useNavigate();
     
-    const loginId = localStorage.getItem('loginId');
+    // Use username as the identifier
+    const username = localStorage.getItem('username');
 
     useEffect(() => {
-        if (!loginId) {
+        if (!username) {
             navigate('/login');
             return;
         }
         fetchMyTickets();
-    }, [loginId, navigate]);
+    }, [username, navigate]);
 
     // Fetch Tickets Booked by Logged In User
     const fetchMyTickets = async () => {
         try {
-            // Assuming a backend endpoint exists to fetch tickets for this user
-            const response = await API.get(`/tickets/user/${loginId}`);
+            // Updated to match new backend endpoint
+            const response = await API.get(`/my?username=${encodeURIComponent(username)}`);
             setTickets(response.data || []);
             setTicketError('');
         } catch (err) {
-            setTicketError("Could not load your ticket history.");
+            setTicketError(
+                typeof err.response?.data === 'string'
+                    ? err.response.data
+                    : err.response?.data?.message || 'Could not load your ticket history.'
+            );
         }
     };
 
@@ -44,7 +49,7 @@ const MyTickets = () => {
 
         try {
             // Assuming a backend endpoint exists to update the password
-            await API.put(`/${loginId}/change-password`, {
+            await API.put(`/${username}/change-password`, {
                 oldPassword: passwordData.oldPassword,
                 newPassword: passwordData.newPassword
             });
@@ -67,28 +72,20 @@ const MyTickets = () => {
             <section style={{ marginBottom: '40px', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
                 <h3>My Booked Tickets</h3>
                 {ticketError && <p style={{ color: 'red' }}>{ticketError}</p>}
-                
                 {tickets.length > 0 ? (
-                    <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
-                        <thead>
-                            <tr style={{ backgroundColor: '#eee', textAlign: 'left' }}>
-                                <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Movie Name</th>
-                                <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Theatre</th>
-                                <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Seats</th>
-                                <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Total Tickets</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {tickets.map((ticket, index) => (
-                                <tr key={index}>
-                                    <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{ticket.movieName}</td>
-                                    <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{ticket.theatreName}</td>
-                                    <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{ticket.seatNumbers.join(', ')}</td>
-                                    <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{ticket.numberOfTickets}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+                        {tickets.map((ticket, index) => (
+                            <div key={index} style={{ minWidth: '280px', maxWidth: '350px', background: '#fff', borderRadius: '10px', boxShadow: '0 2px 8px #ccc', padding: '18px', marginBottom: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <div style={{ fontWeight: 'bold', fontSize: '1.1em', marginBottom: '6px' }}>{ticket.movie?.id?.movieName || ticket.movieName}</div>
+                                <div><strong>Theatre:</strong> {ticket.movie?.id?.theatreName || ticket.theatreName}</div>
+                                <div><strong>Seats:</strong> {Array.isArray(ticket.seatNumbers) ? ticket.seatNumbers.join(', ') : ticket.seatNumbers}</div>
+                                <div><strong>Total Tickets:</strong> {ticket.numberOfTickets}</div>
+                                {ticket.transactionId && <div><strong>Transaction ID:</strong> {ticket.transactionId}</div>}
+                                {ticket.showTime && <div><strong>Show Time:</strong> {ticket.showTime}</div>}
+                                {ticket.bookingTime && <div><strong>Booking Time:</strong> {ticket.bookingTime}</div>}
+                            </div>
+                        ))}
+                    </div>
                 ) : (
                     <p>You have not booked any tickets yet.</p>
                 )}
