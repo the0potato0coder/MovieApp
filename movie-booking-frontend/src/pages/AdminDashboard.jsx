@@ -14,7 +14,6 @@ const AdminDashboard = () => {
     });
     const navigate = useNavigate();
 
-    // Verify Admin Role on load
     useEffect(() => {
         const role = localStorage.getItem('role');
         if (role !== 'ADMIN') {
@@ -30,34 +29,29 @@ const AdminDashboard = () => {
             const response = await API.get('/all');
             setMovies(response.data || []);
             setError('');
-        } catch (err) {
-            setError("Failed to fetch movies.");
+        } catch {
+            setError('Failed to fetch movies.');
         }
     };
 
-    // US_04: Admin Can Delete the Movie
     const handleDeleteMovie = async (movieName, theatreName) => {
         if (!window.confirm(`Are you sure you want to delete ${movieName}?`)) return;
-        
         try {
-            // DELETE /api/v1.0/moviebooking/<moviename>/delete/<id>
             await API.delete(`/${movieName}/delete/${theatreName}`);
             setSuccessMessage(`${movieName} deleted successfully.`);
-            fetchMovies(); // Refresh the dashboard after deletion
+            fetchMovies();
         } catch (err) {
-            setError(err.response?.data || "Failed to delete movie.");
+            setError(err.response?.data || 'Failed to delete movie.');
         }
     };
 
-    // US_04: Admin Can Manually Mark Movie As SOLD OUT / BOOK ASAP
     const handleUpdateStatus = async (movieName, theatreName, newStatus) => {
         try {
-            // Use the new backend endpoint for direct status update
             await API.put(`/admin/status/${movieName}/${theatreName}?status=${encodeURIComponent(newStatus)}`);
             setSuccessMessage(`${movieName} status updated to ${newStatus}.`);
-            fetchMovies(); // Refresh Availability Option
+            fetchMovies();
         } catch (err) {
-            setError(err.response?.data || "Failed to update status.");
+            setError(err.response?.data || 'Failed to update status.');
         }
     };
 
@@ -70,7 +64,6 @@ const AdminDashboard = () => {
         e.preventDefault();
         setError('');
         setSuccessMessage('');
-        // Build payload with nested id object for composite key
         const payload = {
             id: {
                 movieName: newMovie.movieName,
@@ -89,58 +82,90 @@ const AdminDashboard = () => {
         }
     };
 
+    const inputClass = 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition';
+
+    const statusPill = (status) => {
+        const map = {
+            'SOLD OUT': 'bg-red-100 text-red-700',
+            'BOOK ASAP': 'bg-amber-100 text-amber-700',
+            'AVAILABLE': 'bg-green-100 text-green-700',
+        };
+        return `px-3 py-1 rounded-full text-xs font-semibold ${map[status] || 'bg-gray-100 text-gray-700'}`;
+    };
+
     return (
-        <div className="admin-container" style={{ padding: '20px' }}>
-            <header style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #333', paddingBottom: '10px', marginBottom: '20px' }}>
-                <h2 style={{ color: '#d9534f' }}>Admin Dashboard</h2>
-                <button onClick={handleLogout} style={{ padding: '8px 16px', cursor: 'pointer' }}>Logout</button>
+        <div className="max-w-5xl mx-auto px-4 py-6">
+            {/* Header */}
+            <header className="flex justify-between items-center bg-white rounded-xl shadow-sm px-6 py-4 mb-6">
+                <h1 className="text-2xl font-bold text-gray-800">🎬 Admin Dashboard</h1>
+                <div className="flex gap-3">
+                    <button onClick={() => navigate('/home')} className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition cursor-pointer">Home</button>
+                    <button onClick={handleLogout} className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg transition cursor-pointer">Logout</button>
+                </div>
             </header>
 
-            {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
-            {successMessage && <p style={{ color: 'green', fontWeight: 'bold' }}>{successMessage}</p>}
+            {/* Messages */}
+            {error && <p className="text-red-600 text-sm font-medium text-center bg-red-50 rounded-lg p-3 mb-4">{error}</p>}
+            {successMessage && <p className="text-green-600 text-sm font-medium text-center bg-green-50 rounded-lg p-3 mb-4">{successMessage}</p>}
 
             {/* Add Movie Form */}
-            <form onSubmit={handleAddMovie} style={{ marginBottom: '2rem', border: '1px solid #ccc', padding: '1rem' }}>
-                <h3>Add New Movie</h3>
-                <input type="text" placeholder="Movie Name" required value={newMovie.movieName} onChange={e => setNewMovie({ ...newMovie, movieName: e.target.value })} />
-                <input type="text" placeholder="Theatre Name" required value={newMovie.theatreName} onChange={e => setNewMovie({ ...newMovie, theatreName: e.target.value })} />
-                <input type="number" placeholder="Total Tickets" required min="1" value={newMovie.totalTicketsAllotted} onChange={e => setNewMovie({ ...newMovie, totalTicketsAllotted: Number(e.target.value) })} />
-                <button type="submit">Add Movie</button>
-            </form>
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-8 max-w-xl">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">Add New Movie</h2>
+                <form onSubmit={handleAddMovie} className="space-y-4">
+                    <input type="text" placeholder="Movie Name" required value={newMovie.movieName} onChange={e => setNewMovie({ ...newMovie, movieName: e.target.value })} className={inputClass} />
+                    <input type="text" placeholder="Theatre Name" required value={newMovie.theatreName} onChange={e => setNewMovie({ ...newMovie, theatreName: e.target.value })} className={inputClass} />
+                    <input type="number" placeholder="Total Tickets" required min="1" value={newMovie.totalTicketsAllotted} onChange={e => setNewMovie({ ...newMovie, totalTicketsAllotted: Number(e.target.value) })} className={inputClass} />
+                    <button type="submit" className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition cursor-pointer">Add Movie</button>
+                </form>
+            </div>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-                <thead>
-                    <tr style={{ backgroundColor: '#f4f4f4', textAlign: 'left' }}>
-                        <th style={{ border: '1px solid #ddd', padding: '10px' }}>Movie Name</th>
-                        <th style={{ border: '1px solid #ddd', padding: '10px' }}>Theatre</th>
-                        <th style={{ border: '1px solid #ddd', padding: '10px' }}>Total Tickets</th>
-                        <th style={{ border: '1px solid #ddd', padding: '10px' }}>Tickets Available</th>
-                        <th style={{ border: '1px solid #ddd', padding: '10px' }}>Current Status</th>
-                        <th style={{ border: '1px solid #ddd', padding: '10px' }}>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {movies.map((movie, idx) => {
-                        // Calculate tickets available if not present
-                        const available = (movie.totalTicketsAllotted || 0) - (movie.ticketsBooked || 0);
-                        return (
-                            <tr key={idx}>
-                                <td style={{ border: '1px solid #ddd', padding: '10px' }}>{movie.movieName}</td>
-                                <td style={{ border: '1px solid #ddd', padding: '10px' }}>{movie.theatreName}</td>
-                                <td style={{ border: '1px solid #ddd', padding: '10px' }}>{movie.totalTicketsAllotted}</td>
-                                <td style={{ border: '1px solid #ddd', padding: '10px' }}>{available}</td>
-                                <td style={{ border: '1px solid #ddd', padding: '10px' }}>{movie.ticketStatus}</td>
-                                <td style={{ border: '1px solid #ddd', padding: '10px' }}>
-                                    <button onClick={() => handleUpdateStatus(movie.movieName, movie.theatreName, 'SOLD OUT')} style={{ marginRight: 8 }}>Mark Sold Out</button>
-                                    <button onClick={() => handleUpdateStatus(movie.movieName, movie.theatreName, 'BOOK ASAP')} style={{ marginRight: 8 }}>Mark Book ASAP</button>
-                                    <button onClick={() => handleUpdateStatus(movie.movieName, movie.theatreName, 'AVAILABLE')} style={{ marginRight: 8 }}>Mark Available</button>
-                                    <button onClick={() => handleDeleteMovie(movie.movieName, movie.theatreName)} style={{ color: 'red' }}>Delete</button>
-                                </td>
+            {/* Movie Table */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">
+                            <tr>
+                                <th className="px-4 py-3">Movie</th>
+                                <th className="px-4 py-3">Theatre</th>
+                                <th className="px-4 py-3 text-center">Available</th>
+                                <th className="px-4 py-3 text-center">Status</th>
+                                <th className="px-4 py-3 text-center">Actions</th>
                             </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {movies.map((movie, idx) => {
+                                const movieName = movie.id?.movieName || movie.movieName;
+                                const theatreName = movie.id?.theatreName || movie.theatreName;
+                                const available = movie.ticketStatus === 'SOLD OUT' ? 0 : (movie.availableTickets ?? '—');
+                                return (
+                                    <tr key={idx} className="hover:bg-gray-50 transition">
+                                        <td className="px-4 py-3 font-medium text-gray-800">{movieName}</td>
+                                        <td className="px-4 py-3 text-gray-600">{theatreName}</td>
+                                        <td className="px-4 py-3 text-center font-semibold text-gray-800">{available}</td>
+                                        <td className="px-4 py-3 text-center">
+                                            <span className={statusPill(movie.ticketStatus)}>{movie.ticketStatus}</span>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex flex-wrap gap-2 justify-center">
+                                                <button onClick={() => handleUpdateStatus(movieName, theatreName, 'SOLD OUT')} className="px-3 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition cursor-pointer">Sold Out</button>
+                                                <button onClick={() => handleUpdateStatus(movieName, theatreName, 'BOOK ASAP')} className="px-3 py-1 text-xs bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-lg transition cursor-pointer">Book ASAP</button>
+                                                <button onClick={() => handleUpdateStatus(movieName, theatreName, 'AVAILABLE')} className="px-3 py-1 text-xs bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition cursor-pointer">Available</button>
+                                                <button onClick={() => handleDeleteMovie(movieName, theatreName)} className="px-3 py-1 text-xs bg-gray-800 hover:bg-gray-900 text-white rounded-lg transition cursor-pointer">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+                {movies.length === 0 && (
+                    <div className="text-center py-12 text-gray-400">
+                        <p className="text-4xl mb-2">🎥</p>
+                        <p>No movies yet. Add one above!</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

@@ -1,5 +1,6 @@
 package com.moviebookingapp.movie_service.service;
 
+import com.moviebookingapp.movie_service.dto.MovieResponseDTO;
 import com.moviebookingapp.movie_service.model.Movie;
 import com.moviebookingapp.movie_service.model.MovieTheatreKey;
 import com.moviebookingapp.movie_service.repository.MovieRepository;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MovieServiceImpl implements MovieService {
@@ -27,9 +29,27 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
+    public List<MovieResponseDTO> getAllMoviesWithAvailability() {
+        List<Movie> movies = movieRepository.findAll();
+        return movies.stream().map(this::toMovieResponseDTO).collect(Collectors.toList());
+    }
+
+    @Override
     public List<Movie> searchMoviesByName(String movieName) {
-        // Calls the custom method we defined in the repository
         return movieRepository.findByIdMovieNameContainingIgnoreCase(movieName);
+    }
+
+    @Override
+    public List<MovieResponseDTO> searchMoviesByNameWithAvailability(String movieName) {
+        List<Movie> movies = movieRepository.findByIdMovieNameContainingIgnoreCase(movieName);
+        return movies.stream().map(this::toMovieResponseDTO).collect(Collectors.toList());
+    }
+
+    private MovieResponseDTO toMovieResponseDTO(Movie movie) {
+        Integer booked = ticketRepository.sumTicketsBookedForMovieAndTheatre(
+                movie.getId().getMovieName(), movie.getId().getTheatreName());
+        if (booked == null) booked = 0;
+        return MovieResponseDTO.fromMovie(movie, booked);
     }
 
     // You will need to inject TicketRepository into MovieServiceImpl to do the math

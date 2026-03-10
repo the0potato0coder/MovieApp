@@ -8,107 +8,117 @@ const Home = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    // Fetch all movies when the component loads
     const fetchMovies = async () => {
         try {
             const response = await API.get('/all');
             setMovies(response.data || []);
             setError('');
-        } catch (err) {
-            setError("Failed to fetch movies.");
+        } catch {
+            setError('Failed to fetch movies.');
         }
     };
 
-    useEffect(() => {
-        fetchMovies();
-    }, []);
+    useEffect(() => { fetchMovies(); }, []);
 
-    // US_02: Search By Movie Name 
     const handleSearch = async (e) => {
         e.preventDefault();
-        if (!searchTerm.trim()) {
-            fetchMovies(); // If search is empty, reload all movies
-            return;
-        }
+        if (!searchTerm.trim()) { fetchMovies(); return; }
         try {
             const response = await API.get(`/movies/search/${searchTerm}`);
             setMovies(response.data || []);
             setError('');
         } catch (err) {
-            if (err.response && err.response.status === 404) {
-                setMovies([]);
-                setError("No movies found matching your search.");
-            } else {
-                setError("Search failed.");
-            }
+            if (err.response?.status === 404) { setMovies([]); setError('No movies found matching your search.'); }
+            else setError('Search failed.');
         }
     };
 
-    // US_01: Can logout from their account 
-    const handleLogout = () => {
-        localStorage.clear(); // Clear the JWT token and user details
-        navigate('/login');
+    const handleLogout = () => { localStorage.clear(); navigate('/login'); };
+
+    const statusConfig = {
+        'SOLD OUT': { bg: 'bg-red-100', text: 'text-red-700' },
+        'BOOK ASAP': { bg: 'bg-amber-100', text: 'text-amber-700' },
     };
 
-    const handleBookClick = (movieName, theatreName) => {
-        // We will build this route next!
-        navigate(`/book/${movieName}/${theatreName}`); 
-    };
+    const getStatus = (status) => statusConfig[status] || { bg: 'bg-green-100', text: 'text-green-700' };
 
     return (
-        <div className="home-container">
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #eee', paddingBottom: '10px' }}>
-                <h2>MovieBookingApp Home</h2>
-                <div>
-                    {/* Add this new button */}
-                    <button onClick={() => navigate('/my-tickets')} style={{ padding: '8px 16px', cursor: 'pointer', marginRight: '10px' }}>My Tickets</button>
-                    
-                    <button onClick={handleLogout} style={{ padding: '8px 16px', cursor: 'pointer' }}>Logout</button>
+        <div className="max-w-6xl mx-auto px-4 py-6">
+            {/* Header */}
+            <header className="flex flex-col sm:flex-row justify-between items-center bg-white rounded-xl shadow-sm px-6 py-4 mb-8 gap-4">
+                <h1 className="text-2xl font-bold text-gray-800">🎬 MovieBooking</h1>
+                <div className="flex gap-2">
+                    <button onClick={() => navigate('/my-tickets')} className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition cursor-pointer">
+                        My Tickets
+                    </button>
+                    <button onClick={() => navigate('/profile')} className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition cursor-pointer">
+                        Profile
+                    </button>
+                    <button onClick={handleLogout} className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg transition cursor-pointer">
+                        Logout
+                    </button>
                 </div>
             </header>
 
-            <div className="search-bar" style={{ margin: '20px 0' }}>
-                <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px' }}>
-                    <input 
-                        type="text" 
-                        placeholder="Search by Movie Name..." 
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{ padding: '8px', width: '300px' }}
-                    />
-                    <button type="submit" style={{ padding: '8px 16px' }}>Search</button>
-                </form>
-            </div>
+            {/* Search */}
+            <form onSubmit={handleSearch} className="flex gap-3 mb-8">
+                <input
+                    type="text"
+                    placeholder="Search by movie name..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="flex-1 max-w-sm px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                />
+                <button type="submit" className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition cursor-pointer">
+                    Search
+                </button>
+            </form>
 
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p className="text-red-600 text-sm font-medium text-center bg-red-50 rounded-lg p-3 mb-6">{error}</p>}
 
-            <div className="movie-list" style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '20px' }}>
-                {movies.length > 0 ? movies.map((movie, index) => (
-                    <div key={index} style={{ border: '1px solid #ccc', padding: '15px', borderRadius: '8px', width: '250px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
-                        <h3 style={{ margin: '0 0 10px 0' }}>{movie.id.movieName}</h3>
-                        <p style={{ margin: '5px 0' }}><strong>Theatre:</strong> {movie.id.theatreName}</p>
-                        <p style={{ margin: '5px 0' }}><strong>Status:</strong> <span style={{ color: movie.ticketStatus === 'SOLD OUT' ? 'red' : 'green' }}>{movie.ticketStatus || 'AVAILABLE'}</span></p>
-                        
-                        {/* US_03: Sold Out Option Disables Tickets Booking  */}
-                        <button 
-                            onClick={() => handleBookClick(movie.id.movieName, movie.id.theatreName)}
-                            disabled={movie.ticketStatus === 'SOLD OUT'}
-                            style={{
-                                marginTop: '15px',
-                                width: '100%',
-                                padding: '10px',
-                                border: 'none',
-                                borderRadius: '4px',
-                                backgroundColor: movie.ticketStatus === 'SOLD OUT' ? '#ccc' : '#007bff',
-                                color: 'white',
-                                cursor: movie.ticketStatus === 'SOLD OUT' ? 'not-allowed' : 'pointer'
-                            }}
-                        >
-                            {movie.ticketStatus === 'SOLD OUT' ? 'Sold Out' : 'Book Ticket'}
-                        </button>
-                    </div>
-                )) : (
-                    !error && <p>No movies available right now.</p>
+            {/* Movie Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {movies.length > 0 ? movies.map((movie, index) => {
+                    const status = movie.ticketStatus || 'AVAILABLE';
+                    const sc = getStatus(status);
+                    const isSoldOut = status === 'SOLD OUT';
+
+                    return (
+                        <div key={index} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col">
+                            {/* Card top accent */}
+                            <div className={`h-1.5 ${isSoldOut ? 'bg-red-400' : 'bg-blue-500'}`} />
+                            <div className="p-5 flex flex-col flex-1">
+                                <h3 className="text-lg font-bold text-gray-800 mb-2">{movie.id.movieName}</h3>
+                                <p className="text-sm text-gray-500 mb-1">🎭 {movie.id.theatreName}</p>
+                                <p className="text-sm text-gray-500 mb-3">
+                                    🎟️ {isSoldOut ? 0 : (movie.availableTickets ?? '—')} tickets available
+                                </p>
+                                <p className="mb-4">
+                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${sc.bg} ${sc.text}`}>
+                                        {status}
+                                    </span>
+                                </p>
+                                <button
+                                    onClick={() => navigate(`/book/${movie.id.movieName}/${movie.id.theatreName}`)}
+                                    disabled={isSoldOut}
+                                    className={`mt-auto w-full py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer ${
+                                        isSoldOut
+                                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                    }`}
+                                >
+                                    {isSoldOut ? 'Sold Out' : 'Book Ticket →'}
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }) : (
+                    !error && (
+                        <div className="col-span-full text-center py-16 text-gray-400">
+                            <p className="text-5xl mb-4">🎬</p>
+                            <p className="text-lg">No movies available right now.</p>
+                        </div>
+                    )
                 )}
             </div>
         </div>

@@ -8,23 +8,23 @@ import BookTicket from './pages/BookTicket';
 import MyTickets from './pages/MyTickets';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Profile from './pages/Profile';
 
 function App() {
   return (
     <Router>
-      <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
         <Routes>
-          {/* Default route redirects to login */}
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          {/* US_02: Home Page After Successful Login */}
           <Route path="/home" element={<Home />} />
           <Route path="/book/:movieName/:theatreName" element={<BookTicket />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/my-tickets" element={<MyTickets />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </Router>

@@ -7,74 +7,98 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
+    const [touched, setTouched] = useState({});
     const navigate = useNavigate();
+
+    const validate = () => {
+        const errors = {};
+        if (!username.trim()) errors.username = 'Username is required.';
+        else if (username.trim().length < 3) errors.username = 'Username must be at least 3 characters.';
+        if (!password) errors.password = 'Password is required.';
+        else if (password.length < 6) errors.password = 'Password must be at least 6 characters.';
+        return errors;
+    };
+
+    const handleBlur = (field) => {
+        setTouched((prev) => ({ ...prev, [field]: true }));
+        setFieldErrors(validate());
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
         setMessage('');
-        
+        const errors = validate();
+        setFieldErrors(errors);
+        setTouched({ username: true, password: true });
+        if (Object.keys(errors).length > 0) return;
         try {
-            // Sends the GET request with query parameters as strictly required by the rubric
-            const response = await API.get('/login', {
-                params: { username, password }
-            });
-
-            // Extract the JWT token from the backend response
+            const response = await API.get('/login', { params: { username, password } });
             const token = response.data.token;
-            
-            // Store the token in localStorage so our API interceptor can use it
             localStorage.setItem('token', token);
-
-            // Decode the JWT payload to extract the user's role (ADMIN or CUSTOMER)
             const payload = JSON.parse(atob(token.split('.')[1]));
             localStorage.setItem('role', payload.role);
             localStorage.setItem('username', username);
-
-            // Redirect based on role
-            if (payload.role === 'ADMIN') {
-                navigate('/admin');
-            } else {
-                navigate('/home');
-            }
+            navigate(payload.role === 'ADMIN' ? '/admin' : '/home');
         } catch (err) {
-            setError(err.response?.data || "Invalid credentials. Please try again.");
+            setError(err.response?.data || 'Invalid credentials. Please try again.');
         }
     };
 
     return (
-        <div className="form-container">
-            <h2>Login</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {message && <p style={{ color: 'green' }}>{message}</p>}
-            
-            <form onSubmit={handleLogin}>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    required
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <button type="submit">Login</button>
-            </form>
-            
-            <div style={{ marginTop: '15px' }}>
-                {/* Forgot Password Reset option */}
-                <Link to="/forgot-password" style={{ color: 'blue', textDecoration: 'underline' }}>
-                    Forgot Password?
-                </Link>
-            </div>
-            
-            <div style={{ marginTop: '15px' }}>
-                <p>Don't have an account? <Link to="/register">Register here</Link></p>
+        <div className="min-h-screen flex items-center justify-center px-4">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold text-gray-800">🎬 MovieBooking</h1>
+                    <p className="text-gray-500 mt-1">Sign in to your account</p>
+                </div>
+
+                {error && <p className="text-red-600 text-sm font-medium text-center bg-red-50 rounded-lg p-3 mb-4">{error}</p>}
+                {message && <p className="text-green-600 text-sm font-medium text-center bg-green-50 rounded-lg p-3 mb-4">{message}</p>}
+
+                <form onSubmit={handleLogin} className="space-y-4">
+                    <div>
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            onBlur={() => handleBlur('username')}
+                            className={`w-full px-4 py-3 rounded-lg border ${touched.username && fieldErrors.username ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-500'} focus:ring-2 focus:border-transparent outline-none transition`}
+                        />
+                        {touched.username && fieldErrors.username && <p className="text-red-500 text-xs mt-1">{fieldErrors.username}</p>}
+                    </div>
+                    <div>
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            onBlur={() => handleBlur('password')}
+                            className={`w-full px-4 py-3 rounded-lg border ${touched.password && fieldErrors.password ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-500'} focus:ring-2 focus:border-transparent outline-none transition`}
+                        />
+                        {touched.password && fieldErrors.password && <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>}
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-200 cursor-pointer"
+                    >
+                        Sign In
+                    </button>
+                </form>
+
+                <div className="mt-6 text-center text-sm space-y-2">
+                    <Link to="/forgot-password" className="text-blue-600 hover:text-blue-800 hover:underline">
+                        Forgot Password?
+                    </Link>
+                    <p className="text-gray-500">
+                        Don't have an account?{' '}
+                        <Link to="/register" className="text-blue-600 hover:text-blue-800 font-medium hover:underline">
+                            Register here
+                        </Link>
+                    </p>
+                </div>
             </div>
         </div>
     );
