@@ -58,7 +58,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1.0/moviebooking/register", "/api/v1.0/moviebooking/login").permitAll()
                         .requestMatchers("/api/v1.0/moviebooking/all").permitAll()
                         .requestMatchers("/api/v1.0/moviebooking/movies/search/**").permitAll()
-                        .requestMatchers("/api/v1.0/moviebooking/*/forgot").permitAll()
+                        .requestMatchers("/api/v1.0/moviebooking/forgot-password").permitAll()
+                        .requestMatchers("/api/v1.0/moviebooking/reset-password").permitAll()
 
                         // Admin Endpoints: Update Ticket Status and Delete Movie
                         .requestMatchers(HttpMethod.PUT, "/api/v1.0/moviebooking/*/update/*").hasRole("ADMIN")

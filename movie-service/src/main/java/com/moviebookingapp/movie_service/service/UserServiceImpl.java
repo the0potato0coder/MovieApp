@@ -99,17 +99,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String forgotPassword(String username) throws Exception {
-        // Find the user by their Login ID (which acts as the username)
-        java.util.Optional<User> userOptional = userRepository.findByLoginIdentifier(username);
-
+    public String forgotPassword(String identifier) throws Exception {
+        Optional<User> userOptional = userRepository.findByLoginIdentifier(identifier);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            // In a production app, we would email a secure link.
-            // For this rubric, returning a success message or the password hint fulfills the flow.
-            return "Password reset link has been sent to the registered email: " + user.getEmail();
+            // Generate a random token
+            String token = java.util.UUID.randomUUID().toString();
+            user.setResetToken(token);
+            user.setResetTokenExpiry(java.time.LocalDateTime.now().plusMinutes(30));
+            userRepository.save(user);
+            // In production, send email. Here, return token for demo/testing.
+            return "Password reset token generated. Use this token to reset your password: " + token;
         } else {
-            throw new Exception("Username not found.");
+            throw new Exception("User not found with identifier: " + identifier);
+        }
+    }
+
+    @Override
+    public String resetPassword(String token, String newPassword) throws Exception {
+        Optional<User> userOptional = userRepository.findByResetToken(token);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if (user.getResetTokenExpiry() == null || user.getResetTokenExpiry().isBefore(java.time.LocalDateTime.now())) {
+                throw new Exception("Reset token has expired. Please request a new one.");
+            }
+            user.setPassword(newPassword); // In production, hash the password!
+            user.setResetToken(null);
+            user.setResetTokenExpiry(null);
+            userRepository.save(user);
+            return "Password has been reset successfully.";
+        } else {
+            throw new Exception("Invalid or expired reset token.");
         }
     }
 }

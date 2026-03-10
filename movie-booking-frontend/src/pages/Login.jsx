@@ -42,21 +42,6 @@ const Login = () => {
         }
     };
 
-    const handleForgotPassword = async () => {
-        if (!username) {
-            setError("Please enter your Username first to reset your password.");
-            return;
-        }
-        try {
-            // Calls the exact forgot password endpoint from the rubric
-            const response = await API.get(`/${username}/forgot`);
-            setMessage(response.data);
-            setError('');
-        } catch (err) {
-            setError("Failed to process forgot password request.");
-        }
-    };
-
     return (
         <div className="form-container">
             <h2>Login</h2>
@@ -83,13 +68,9 @@ const Login = () => {
             
             <div style={{ marginTop: '15px' }}>
                 {/* Forgot Password Reset option */}
-                <button 
-                    type="button" 
-                    onClick={handleForgotPassword} 
-                    style={{ background: 'none', color: 'blue', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-                >
+                <Link to="/forgot-password" style={{ color: 'blue', textDecoration: 'underline' }}>
                     Forgot Password?
-                </button>
+                </Link>
             </div>
             
             <div style={{ marginTop: '15px' }}>

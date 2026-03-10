@@ -41,4 +41,7 @@ public class User {
     private String contactNumber;
 
     private Role role;
+
+    private String resetToken;
+    private java.time.LocalDateTime resetTokenExpiry;
 }

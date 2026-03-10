@@ -6,5 +6,6 @@ import com.moviebookingapp.movie_service.model.User;
 public interface UserService {
     User registerUser(UserRegistrationDTO registrationDto) throws Exception;
     String loginUser(String identifier, String password) throws Exception;
-    String forgotPassword(String username) throws Exception;
+    String forgotPassword(String identifier) throws Exception;
+    String resetPassword(String token, String newPassword) throws Exception;
 }

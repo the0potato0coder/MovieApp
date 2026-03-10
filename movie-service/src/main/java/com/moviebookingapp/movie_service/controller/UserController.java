@@ -46,11 +46,25 @@ public class UserController {
         }
     }
 
-    // Forgot password
-    @GetMapping("/{username}/forgot")
-    public ResponseEntity<?> forgotPassword(@PathVariable String username) {
-        // In a real app, this would trigger an email or reset flow.
-        // For the MVP, we can return a success message or a temporary password mechanism.
-        return new ResponseEntity<>("Password reset instructions sent for user: " + username, HttpStatus.OK);
+    // Forgot password (request reset token)
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String identifier) {
+        try {
+            String message = userService.forgotPassword(identifier);
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Reset password (with token)
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+        try {
+            String message = userService.resetPassword(token, newPassword);
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 }
