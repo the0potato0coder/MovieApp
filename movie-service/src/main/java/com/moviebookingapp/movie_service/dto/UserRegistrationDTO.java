@@ -14,7 +14,7 @@ public class UserRegistrationDTO {
     private String email;
     private String username;
     private String password;
-    private String confirmPassword; // Here is the field the client requested!
+    private String confirmPassword;
     private String contactNumber;
     private String role;
 }

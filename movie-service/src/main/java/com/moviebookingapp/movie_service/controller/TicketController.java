@@ -16,11 +16,9 @@ public class TicketController {
         this.ticketService = ticketService;
     }
 
-    // Endpoint to book a ticket
     @PostMapping("/{movieName}/add")
     public ResponseEntity<?> bookTicket(@PathVariable String movieName, @RequestBody TicketBookingDTO bookingDTO) {
         try {
-            // Set the movieName from the path variable to the DTO to ensure consistency
             bookingDTO.setMovieName(movieName);
             Ticket bookedTicket = ticketService.bookTicket(bookingDTO);
             return ResponseEntity.ok(bookedTicket);
@@ -29,7 +27,6 @@ public class TicketController {
         }
     }
 
-    // Endpoint to get all tickets for a user
     @GetMapping("/my")
     public ResponseEntity<?> getMyTickets(@RequestParam String username) {
         try {
@@ -39,7 +36,6 @@ public class TicketController {
         }
     }
 
-    // Endpoint to get booked seats for seat selection
     @GetMapping("/seats/booked")
     public ResponseEntity<?> getBookedSeats(@RequestParam String movieName, @RequestParam String theatreName) {
         try {

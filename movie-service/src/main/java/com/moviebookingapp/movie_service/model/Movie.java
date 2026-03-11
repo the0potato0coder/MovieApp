@@ -21,7 +21,7 @@ public class Movie {
 
     private int totalTicketsAlloted;
 
-    private String ticketStatus; // Will hold "SOLD OUT", "BOOK ASAP", or "AVAILABLE"
+    private String ticketStatus;
 
     public int getTotalTicketsAllotted() {
         return totalTicketsAlloted;

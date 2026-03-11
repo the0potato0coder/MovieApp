@@ -42,7 +42,6 @@ const Profile = () => {
 
     return (
         <div className="max-w-xl mx-auto px-4 py-6">
-            {/* Header */}
             <header className="flex justify-between items-center bg-white rounded-xl shadow-sm px-6 py-4 mb-8">
                 <h1 className="text-2xl font-bold text-gray-800">My Profile</h1>
                 <div className="flex gap-2">
@@ -58,7 +57,6 @@ const Profile = () => {
                 </div>
             </header>
 
-            {/* Profile Card */}
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
                 <div className="flex items-center gap-5">
                     <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center text-2xl font-bold shrink-0">
@@ -75,7 +73,6 @@ const Profile = () => {
                 </div>
             </div>
 
-            {/* Change Password Card */}
             <div className="bg-white rounded-xl shadow-sm p-6">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Change Password</h3>
 

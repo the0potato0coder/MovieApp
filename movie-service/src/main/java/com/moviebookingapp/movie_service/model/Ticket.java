@@ -34,7 +34,6 @@ public class Ticket {
     @Column(name = "seat_number")
     private List<String> seatNumbers;
 
-    // Add username field for ticket owner
     private String username;
 
     public Ticket(Movie movie, Long numberOfTickets, List<String> seatNumbers) {

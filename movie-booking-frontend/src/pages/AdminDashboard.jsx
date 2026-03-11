@@ -95,7 +95,6 @@ const AdminDashboard = () => {
 
     return (
         <div className="max-w-5xl mx-auto px-4 py-6">
-            {/* Header */}
             <header className="flex justify-between items-center bg-white rounded-xl shadow-sm px-6 py-4 mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">🎬 Admin Dashboard</h1>
                 <div className="flex gap-3">
@@ -104,11 +103,9 @@ const AdminDashboard = () => {
                 </div>
             </header>
 
-            {/* Messages */}
             {error && <p className="text-red-600 text-sm font-medium text-center bg-red-50 rounded-lg p-3 mb-4">{error}</p>}
             {successMessage && <p className="text-green-600 text-sm font-medium text-center bg-green-50 rounded-lg p-3 mb-4">{successMessage}</p>}
 
-            {/* Add Movie Form */}
             <div className="bg-white rounded-xl shadow-sm p-6 mb-8 max-w-xl">
                 <h2 className="text-lg font-semibold text-gray-800 mb-4">Add New Movie</h2>
                 <form onSubmit={handleAddMovie} className="space-y-4">
@@ -119,7 +116,6 @@ const AdminDashboard = () => {
                 </form>
             </div>
 
-            {/* Movie Table */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">

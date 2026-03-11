@@ -10,7 +10,6 @@ import java.util.List;
 @Repository
 public interface MovieRepository extends JpaRepository<com.moviebookingapp.movie_service.model.Movie, MovieTheatreKey> {
 
-    // US_02: Spring Data JPA will automatically generate the SQL to search by movie name, ignoring case!
     List<Movie> findByIdMovieNameContainingIgnoreCase(String movieName);
 
 }

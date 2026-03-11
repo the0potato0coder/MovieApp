@@ -97,7 +97,6 @@ const BookTicket = () => {
 
     return (
         <div className="max-w-2xl mx-auto px-4 py-6">
-            {/* Header */}
             <header className="flex justify-between items-center bg-white rounded-xl shadow-sm px-6 py-4 mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">🎬 Book Tickets</h1>
                 <button onClick={() => navigate('/home')} className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition cursor-pointer">
@@ -105,7 +104,6 @@ const BookTicket = () => {
                 </button>
             </header>
 
-            {/* Movie Info */}
             <div className="flex gap-6 bg-white rounded-xl shadow-sm px-6 py-4 mb-6">
                 <div>
                     <p className="text-xs text-gray-400 uppercase tracking-wide">Movie</p>
@@ -120,7 +118,6 @@ const BookTicket = () => {
             {error && <p className="text-red-600 text-sm font-medium text-center bg-red-50 rounded-lg p-3 mb-4">{error}</p>}
 
             <form onSubmit={handleBookTicket} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-                {/* Ticket Count */}
                 <div className="flex items-center gap-4">
                     <label htmlFor="numTickets" className="text-sm font-medium text-gray-700">Tickets:</label>
                     <input
@@ -135,7 +132,6 @@ const BookTicket = () => {
                     />
                 </div>
 
-                {/* Legend */}
                 <div className="flex gap-6 justify-center bg-gray-50 rounded-lg py-3">
                     <div className="flex items-center gap-2 text-xs text-gray-600">
                         <span className="w-5 h-5 rounded-md bg-emerald-100 border border-emerald-300"></span> Available
@@ -148,12 +144,10 @@ const BookTicket = () => {
                     </div>
                 </div>
 
-                {/* Screen */}
                 <div className="text-center py-2 bg-gradient-to-r from-transparent via-gray-300 to-transparent text-gray-400 text-[11px] tracking-[4px] uppercase rounded">
                     SCREEN
                 </div>
 
-                {/* Seat Map */}
                 <div className="flex flex-col items-center gap-1.5">
                     {ROWS.map(row => (
                         <div key={row} className="flex items-center gap-1.5">
@@ -176,14 +170,12 @@ const BookTicket = () => {
                     ))}
                 </div>
 
-                {/* Selection Summary */}
                 {selectedSeats.length > 0 && (
                     <div className="text-center bg-blue-50 text-blue-700 text-sm font-medium rounded-lg py-3">
                         Selected: <span className="font-bold">{selectedSeats.join(', ')}</span>
                     </div>
                 )}
 
-                {/* Actions */}
                 <div className="flex gap-3">
                     <button type="submit" className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition cursor-pointer">
                         Confirm Booking

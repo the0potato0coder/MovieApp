@@ -27,31 +27,25 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        // 1. Look for the "Authorization" header in the incoming request
         final String authorizationHeader = request.getHeader("Authorization");
 
         String username = null;
         String jwt = null;
         String role = null;
 
-        // 2. Check if the header exists and starts with "Bearer " (Industry standard)
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7); // Extract the token without the "Bearer " prefix
+            jwt = authorizationHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwt);
                 role = jwtUtil.extractRole(jwt);
             } catch (Exception e) {
-                // Token is invalid or expired
                 System.out.println("JWT Token processing failed: " + e.getMessage());
             }
         }
 
-        // 3. If we found a username and the user isn't already authenticated in this session
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             if (jwtUtil.validateToken(jwt, username)) {
-                // 4. Create the authentication token and attach the user's role
-                // Spring Security requires roles to start with "ROLE_"
                 SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -59,12 +53,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // 5. Officially log the user in for this single request
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 
-        // Continue processing the request
         chain.doFilter(request, response);
     }
 }

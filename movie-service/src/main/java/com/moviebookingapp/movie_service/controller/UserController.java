@@ -19,7 +19,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    // Register as new user
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserRegistrationDTO registrationDto) {
         try {
@@ -33,10 +32,8 @@ public class UserController {
     @GetMapping("/login")
     public ResponseEntity<?> loginUser(@RequestParam String username, @RequestParam String password) {
         try {
-            // This now returns the JWT string
             String token = String.valueOf(userService.loginUser(username, password));
 
-            // It is standard practice to return the token in a JSON object
             java.util.Map<String, String> response = new java.util.HashMap<>();
             response.put("token", token);
 
@@ -46,7 +43,6 @@ public class UserController {
         }
     }
 
-    // Forgot password (request reset token)
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestParam String identifier) {
         try {
@@ -57,7 +53,6 @@ public class UserController {
         }
     }
 
-    // Reset password (with token)
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
         try {

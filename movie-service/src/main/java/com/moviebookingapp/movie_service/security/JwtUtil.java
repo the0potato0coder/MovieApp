@@ -15,16 +15,12 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    // Generates a secure key for signing the JWT.
-    // In production, you would store a secret string in your application.properties
     private final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    // Extracts the username (Login ID) from the token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Extracts the Role (e.g., ADMIN or CUSTOMER) from the token
     public String extractRole(String token) {
         Claims claims = extractAllClaims(token);
         return (String) claims.get("role");
@@ -47,24 +43,22 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    // Generates the token when the user logs in
     public String generateToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role); // Embed the role in the token
+        claims.put("role", role);
         return createToken(claims, username);
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(subject) // Typically the username or loginId
+                .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // Token valid for 10 hours
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
                 .signWith(SECRET_KEY)
                 .compact();
     }
 
-    // Validates that the token belongs to the user and hasn't expired
     public Boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));

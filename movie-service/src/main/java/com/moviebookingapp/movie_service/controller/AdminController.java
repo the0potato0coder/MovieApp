@@ -24,7 +24,6 @@ public class AdminController {
         this.ticketService = ticketService;
     }
 
-    // US_04: View booked tickets for a particular movie
     @GetMapping("/tickets/{movieName}")
     public ResponseEntity<List<Ticket>> viewBookedTickets(@PathVariable String movieName) {
         List<Ticket> tickets = ticketService.getBookedTickets(movieName);
@@ -34,7 +33,6 @@ public class AdminController {
         return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 
-    // US_04: Update total tickets allotted for a movie screening
     @PutMapping("/update/{movieName}/{theatreName}")
     public ResponseEntity<?> updateTicketStatus(
             @PathVariable String movieName,
@@ -48,7 +46,6 @@ public class AdminController {
         }
     }
 
-    // Update ticket status directly (SOLD OUT, BOOK ASAP, AVAILABLE)
     @PutMapping("/status/{movieName}/{theatreName}")
     public ResponseEntity<?> updateTicketStatusDirect(
             @PathVariable String movieName,
@@ -62,7 +59,6 @@ public class AdminController {
         }
     }
 
-    // Add a new movie
     @PostMapping("/add")
     public ResponseEntity<?> addMovie(@RequestBody Movie movie) {
         try {

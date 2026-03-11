@@ -52,7 +52,6 @@ public class MovieServiceImpl implements MovieService {
         return MovieResponseDTO.fromMovie(movie, booked);
     }
 
-    // You will need to inject TicketRepository into MovieServiceImpl to do the math
     @Override
     public Movie updateMovieTickets(String movieName, String theatreName, int newTotalTickets) throws Exception {
         MovieTheatreKey key = new MovieTheatreKey(movieName, theatreName);
@@ -62,13 +61,11 @@ public class MovieServiceImpl implements MovieService {
             Movie movie = movieOpt.get();
             movie.setTotalTicketsAllotted(newTotalTickets);
 
-            // Calculate booked tickets
             Integer alreadyBooked = ticketRepository.sumTicketsBookedForMovieAndTheatre(movieName, theatreName);
             if (alreadyBooked == null) alreadyBooked = 0;
 
             int availableTickets = newTotalTickets - alreadyBooked;
 
-            // Apply the strict rubric conditions [cite: 175, 176, 177]
             if (availableTickets == 0) {
                 movie.setTicketStatus("SOLD OUT");
             } else if (availableTickets <= (newTotalTickets / 2)) {
@@ -83,17 +80,11 @@ public class MovieServiceImpl implements MovieService {
         }
     }
 
-    // Add TicketRepository to your MovieServiceImpl constructor first!
     @Override
     public void deleteMovie(String movieName, String theatreName) throws Exception {
         MovieTheatreKey key = new MovieTheatreKey(movieName, theatreName);
 
         if (movieRepository.existsById(key)) {
-            // Step 1: Fetch and delete all tickets associated with this movie/theatre combo
-            // to satisfy the rubric requirement.
-            // (You'll need a custom query in TicketRepository: deleteByMovieId(key))
-
-            // Step 2: Delete the movie itself
             movieRepository.deleteById(key);
         } else {
             throw new Exception("Movie not found for deletion.");
@@ -107,7 +98,6 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public Movie updateTicketStatusDirect(String movieName, String theatreName, String status) throws Exception {
-        // Fix: MovieTheatreKey expects (theatreName, movieName)
         MovieTheatreKey key = new MovieTheatreKey(theatreName, movieName);
         java.util.Optional<Movie> movieOpt = movieRepository.findById(key);
         if (movieOpt.isPresent()) {

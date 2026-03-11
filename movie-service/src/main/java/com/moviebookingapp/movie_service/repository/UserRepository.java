@@ -11,11 +11,9 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // Handles logging in with either Email, Login ID, or Contact Number
     @Query("SELECT u FROM User u WHERE u.email = :identifier OR u.username = :identifier OR u.contactNumber = :identifier")
     Optional<User> findByLoginIdentifier(@Param("identifier") String identifier);
 
-    // These will be used during Registration (US_01) to ensure uniqueness
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     boolean existsByContactNumber(String contactNumber);

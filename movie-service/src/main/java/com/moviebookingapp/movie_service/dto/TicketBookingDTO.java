@@ -11,7 +11,6 @@ public class TicketBookingDTO {
 
     public TicketBookingDTO() {}
 
-    // Getters and Setters
     public String getMovieName() { return movieName; }
     public void setMovieName(String movieName) { this.movieName = movieName; }
 

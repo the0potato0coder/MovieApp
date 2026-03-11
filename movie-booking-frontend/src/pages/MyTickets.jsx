@@ -29,7 +29,6 @@ const MyTickets = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-6">
-            {/* Header */}
             <header className="flex justify-between items-center bg-white rounded-xl shadow-sm px-6 py-4 mb-8">
                 <h1 className="text-2xl font-bold text-gray-800">🎟️ My Tickets</h1>
                 <div className="flex gap-2">
@@ -48,14 +47,12 @@ const MyTickets = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {tickets.map((ticket, index) => (
                         <div key={index} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
-                            {/* Ticket Header */}
                             <div className="bg-gradient-to-r from-slate-700 to-blue-600 text-white px-5 py-4 flex justify-between items-center">
                                 <span className="font-bold text-base">{ticket.movie?.id?.movieName || ticket.movieName}</span>
                                 <span className="bg-white/20 text-xs px-3 py-1 rounded-full">
                                     {ticket.numberOfTickets} ticket(s)
                                 </span>
                             </div>
-                            {/* Ticket Body */}
                             <div className="px-5 py-4 space-y-0 divide-y divide-gray-100">
                                 <div className="flex justify-between py-2.5 text-sm">
                                     <span className="text-gray-400 font-medium">Theatre</span>

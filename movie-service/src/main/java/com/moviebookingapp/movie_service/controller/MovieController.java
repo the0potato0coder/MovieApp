@@ -21,7 +21,6 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    // View all movies with availability info
     @GetMapping("/all")
     public ResponseEntity<List<MovieResponseDTO>> getAllMovies() {
         List<MovieResponseDTO> movies = movieService.getAllMoviesWithAvailability();
@@ -31,7 +30,6 @@ public class MovieController {
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
-    // Search by movie name with availability info
     @GetMapping("/movies/search/{moviename}")
     public ResponseEntity<List<MovieResponseDTO>> searchMovie(@PathVariable String moviename) {
         List<MovieResponseDTO> movies = movieService.searchMoviesByNameWithAvailability(moviename);
@@ -41,13 +39,9 @@ public class MovieController {
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
-    // Admin: Delete movie
-    // Note: Rubric specifies /<moviename>/delete/<id>
     @DeleteMapping("/{moviename}/delete/{id}")
     public ResponseEntity<?> deleteMovie(@PathVariable String moviename, @PathVariable String id) {
         try {
-            // Note: You will need to add a delete method in your MovieService for this to work
-            // movieService.deleteMovie(moviename, id);
             return new ResponseEntity<>("Movie deleted successfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

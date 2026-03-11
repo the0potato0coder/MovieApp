@@ -44,7 +44,6 @@ const Home = () => {
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-6">
-            {/* Header */}
             <header className="flex flex-col sm:flex-row justify-between items-center bg-white rounded-xl shadow-sm px-6 py-4 mb-8 gap-4">
                 <h1 className="text-2xl font-bold text-gray-800">🎬 MovieBooking</h1>
                 <div className="flex gap-2">
@@ -60,7 +59,6 @@ const Home = () => {
                 </div>
             </header>
 
-            {/* Search */}
             <form onSubmit={handleSearch} className="flex gap-3 mb-8">
                 <input
                     type="text"
@@ -76,7 +74,6 @@ const Home = () => {
 
             {error && <p className="text-red-600 text-sm font-medium text-center bg-red-50 rounded-lg p-3 mb-6">{error}</p>}
 
-            {/* Movie Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {movies.length > 0 ? movies.map((movie, index) => {
                     const status = movie.ticketStatus || 'AVAILABLE';
@@ -85,7 +82,6 @@ const Home = () => {
 
                     return (
                         <div key={index} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col">
-                            {/* Card top accent */}
                             <div className={`h-1.5 ${isSoldOut ? 'bg-red-400' : 'bg-blue-500'}`} />
                             <div className="p-5 flex flex-col flex-1">
                                 <h3 className="text-lg font-bold text-gray-800 mb-2">{movie.id.movieName}</h3>
