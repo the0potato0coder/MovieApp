@@ -28,6 +28,7 @@ public class Movie {
     }
 
     public void setTotalTicketsAllotted(int newTotalTickets) {
+        this.totalTicketsAlloted = newTotalTickets;
     }
 
     public String getMovieName() {
